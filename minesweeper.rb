@@ -15,17 +15,24 @@ class Minesweeper
     move = player.get_move
     @current_move = move
     board.reveal(move)
+    board.reveal_empty_adjacent(move)
     board.render
   end
 
   def run
     board.render
-    until game_over?
+    until game_won? || game_lost?
       take_turn
     end
+
+    puts game_won? ? "Congratulations!" : "KERPLAM!!"
   end
 
-  def game_over?
+  def game_won?
+    board.won?
+  end
+
+  def game_lost?
     if !@current_move.nil?
       board[@current_move].has_bomb?
     else

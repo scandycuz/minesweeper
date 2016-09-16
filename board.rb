@@ -30,6 +30,40 @@ class Board
     end
   end
 
+  def won?
+    grid.all? do |row|
+      row.all? do |tile|
+        tile.explored?
+      end
+    end
+  end
+
+  def adjacent_positions(pos)
+    row, col = pos
+    arr = []
+
+    (row - 1..row + 1).each do |row|
+      (col - 1..col + 1).each do |col|
+        arr << [row, col]
+      end
+    end
+
+    arr.delete_if { |adj_pos| adj_pos.any? { |coord| !coord.between?(0,size - 1) } || adj_pos == pos }
+    arr
+  end
+
+  def reveal_empty_adjacent(pos)
+    adj_positions = adjacent_positions(pos)
+
+    if adj_positions.none? { |adj_pos| self[adj_pos].has_bomb? }
+      self[pos].click
+      adj_positions.each do |adj_pos|
+        self[adj_pos].reveal
+        reveal_empty_adjacent(adj_pos) unless self[adj_pos].clicked?
+      end
+    end
+  end
+
   def size
     grid.length
   end
@@ -47,8 +81,12 @@ class Board
   end
 
   def render
-    (0...size).each do |row|
-      (0...size).each do |col|
+    print "  "
+    (0...size).each { |col_num| print " #{col_num} "}
+    print "\n"
+    (0...size).each_with_index do |row, row_idx|
+      print "#{row_idx} "
+      (0...size).each_with_index do |col, col_idx|
         print self[[row, col]].to_s
       end
       puts "\n"
@@ -64,8 +102,5 @@ class Board
     row, col = pos
     grid[row][col] = value
   end
-
-
-
 
 end

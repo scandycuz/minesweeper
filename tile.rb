@@ -4,17 +4,22 @@ class Tile
   def initialize
     @bomb = false
     @explored = false
+    @clicked = false
   end
 
   def set_bomb
     @bomb = true
   end
 
-  def reveal
-    make_explored
+  def click
+    @clicked = true
   end
 
-  def make_explored
+  def clicked?
+    @clicked
+  end
+
+  def reveal
     @explored = true
   end
 
@@ -28,6 +33,8 @@ class Tile
 
   def to_s
     if has_bomb? && explored?
+      " X "
+    elsif has_bomb? && !explored?
       " X "
     elsif explored? && !has_bomb?
       "   "
